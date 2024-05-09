@@ -1,16 +1,17 @@
+from django.db import models
 from datetime import datetime
 
-from django.db import models
 
 class VendorModel(models.Model):
-    name = models.CharField(max_length=200,null=False,blank=False)
+    name = models.CharField(max_length=200, null=False, blank=False)
     contact_details = models.TextField()
     address = models.TextField()
-    vendor_code = models.CharField(max_length=25,primary_key=True,unique=True)
+    vendor_code = models.CharField(max_length=25, primary_key=True, unique=True)
     on_time_delivery_rate = models.FloatField(default=0)
     quality_rating_avg = models.FloatField(default=0)
     average_response_time = models.FloatField(default=0)
     fulfillment_rate = models.FloatField(default=0)
+
 
     def calculate_on_time_delivery_rate(self):
         completed_orders = self.purchaseorder_set.filter(status='completed')
@@ -32,7 +33,8 @@ class VendorModel(models.Model):
     def calculate_average_response_time(self):
         acknowledged_orders = self.purchaseorder_set.exclude(acknowledgment_date=None)
         if acknowledged_orders.count() > 0:
-            total_response_time = sum([(po.acknowledgment_date - po.issue_date).total_seconds() for po in acknowledged_orders])
+            total_response_time = sum([(po.acknowledgment_date - po.issue_date).total_seconds()
+                                       for po in acknowledged_orders])
             self.average_response_time = total_response_time / acknowledged_orders.count()
         else:
             self.average_response_time = 0
@@ -46,3 +48,5 @@ class VendorModel(models.Model):
         else:
             self.fulfillment_rate = 0
         self.save()
+
+
